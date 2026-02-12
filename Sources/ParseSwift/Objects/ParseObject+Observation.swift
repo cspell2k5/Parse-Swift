@@ -35,6 +35,7 @@ import SwiftUI
     /// - Generic Parameter:
     ///   - T: A type conforming to `ParseObject` that represents the underlying Parse model.
 @available(macOS 14.0, iOS 17.0, *)
+@MainActor
 @Observable @dynamicMemberLookup
 public class ParseObjectObservable<T: ParseObject> {
     private var value: T
