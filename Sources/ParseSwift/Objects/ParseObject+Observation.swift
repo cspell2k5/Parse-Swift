@@ -161,143 +161,41 @@ public extension ParseObjectObservable {
         return newValue
     }
     
-        /// Creates a new instance of the underlying Parse object on the server and updates this observable wrapper.
-        ///
-        /// This method forwards to `T.create(options:)` on the wrapped `ParseObject`, issuing a network request to persist
-        /// the object as a brand-new record (typically one without an existing `objectId`). On success, the server-returned
-        /// instance replaces the internal `value`, which, because this wrapper is annotated with `@Observable`, triggers
-        /// SwiftUI Observation updates so any dependent views refresh automatically.
-        ///
-        /// - Parameter options: Additional request options that control networking behavior, caching, and other Parse client
-        ///   features. Defaults to an empty set.
-        /// - Returns: The newly created object of type `T` as returned by the server. This instance also replaces the wrapper’s
-        ///   internal value, causing observers to be notified.
-        /// - Throws: An error if the create operation fails due to networking issues, validation errors, permissions, or
-        ///   decoding problems.
-        ///
-        /// - Important:
-        ///   - This method is intended for creating brand-new objects. If the object already has an `objectId`, consider using
-        ///     `save`, `replace`, or `update` as appropriate.
-        ///   - Successful creation replaces the wrapped instance. If your UI or logic depends on identity (e.g., `objectId`,
-        ///     equality, or hashing), be aware the instance may change after this call completes.
-        ///
-        /// - Availability: iOS 17.0+ and macOS 14.0+.
-        /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
+        //TODO: - Add Documentation
     @discardableResult func create(options: API.Options = []) async throws -> T {
         let newValue = try await value.create(options: options)
         self.value = newValue
         return newValue
     }
     
-        /// Replaces the existing server-side representation of the wrapped Parse object and updates this observable wrapper.
-        ///
-        /// This method forwards to `T.replace(options:)` on the underlying `ParseObject`, performing a full replacement
-        /// of the object on the server (typically used when you want the server record to match the current local state
-        /// exactly). On success, the server-returned instance replaces the internal `value`. Because this wrapper is
-        /// annotated with `@Observable`, replacing the value automatically triggers SwiftUI Observation updates so
-        /// dependent views refresh.
-        ///
-        /// - Parameter options: Additional request options that control networking behavior, caching, and other Parse client
-        ///   features. Defaults to an empty set.
-        /// - Returns: The replaced object of type `T` as returned by the server. This instance also replaces the wrapper’s
-        ///   internal value, notifying observers of the change.
-        /// - Throws: An error if the replace operation fails due to networking issues, permissions, validation errors,
-        ///   or decoding problems.
-        /// - Important:
-        ///   - Use `replace` when you intend to overwrite the server’s state with the current local state of the object.
-        ///     If you only need to modify specific fields, consider using `update` instead; to create a new record, use `create`.
-        ///   - Successful replacement replaces the wrapped instance. If your UI or logic depends on identity (e.g., `objectId`,
-        ///     equality, or hashing), be aware the instance may change after this call completes.
-        /// - Availability: iOS 17.0+ and macOS 14.0+.
-        /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
+        //TODO: - Add Documentation
     @discardableResult func replace(options: API.Options = []) async throws -> T {
         let newValue = try await value.replace(options: options)
         self.value = newValue
         return newValue
     }
     
-        /// Applies partial changes to the existing server-side representation of the wrapped Parse object and updates this observable wrapper.
-        ///
-        /// This method forwards to `T.update(options:)` on the underlying `ParseObject`, sending only the fields that have
-        /// changed since the object was last fetched or saved. On success, the server-returned instance replaces the internal
-        /// `value`. Because this wrapper is annotated with `@Observable`, replacing the value automatically triggers SwiftUI
-        /// Observation updates so dependent views refresh.
-        ///
-        /// Use this when you need to modify specific fields rather than replace the entire object. For full replacement,
-        /// consider using `replace(options:)`; to create a new record, use `create(options:)`; and to let the SDK decide the
-        /// appropriate operation based on object state, use `save(ignoringCustomObjectIdConfig:options:)`.
-        ///
-        /// - Parameter options: Additional request options that control networking behavior, caching, and other Parse client
-        ///   features. Defaults to an empty set.
-        /// - Returns: The updated object of type `T` as returned by the server. This instance also replaces the wrapper’s
-        ///   internal value, notifying observers of the change.
-        /// - Throws: An error if the update operation fails due to networking issues, permissions, validation errors, or
-        ///   decoding problems.
-        ///
-        /// - Important:
-        ///   - This performs a partial update. Only changed fields are sent to the server.
-        ///   - Successful updates replace the wrapped instance. If your UI or logic depends on identity (e.g., `objectId`,
-        ///     equality, or hashing), be aware the instance may change after this call completes.
-        ///
-        /// - Availability: iOS 17.0+ and macOS 14.0+.
-        /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
+        //TODO: - Add Documentation
     @discardableResult internal func update(options: API.Options = []) async throws -> T {
         let newValue = try await value.update(options: options)
         self.value = newValue
         return newValue
     }
     
-        /// Deletes the underlying Parse object from the server.
-        ///
-        /// This method forwards to `T.delete(options:)` on the wrapped `ParseObject`, issuing a network
-        /// request to remove the object from your Parse backend. On success, the object is deleted on
-        /// the server. Unlike the other mutating operations (`save`, `create`, `replace`, `update`),
-        /// this call does not replace the internal value; however, consumers should consider the object
-        /// invalid for further server-side operations after a successful deletion unless it is recreated.
-        ///
-        /// - Parameter options: Additional request options that control networking behavior, caching,
-        ///   and other Parse client features. Defaults to an empty set.
-        /// - Throws: An error if the delete operation fails due to networking issues, permissions,
-        ///   or server-side errors.
-        ///
-        /// - Important:
-        ///   - After a successful deletion, subsequent operations that assume the object exists on the
-        ///     server (e.g., `fetch`, `update`) may fail unless the object is recreated.
-        ///   - If your UI or logic depends on the presence of this object, ensure you update state
-        ///     accordingly (e.g., remove it from collections, navigate away from detail views).
-        ///
-        /// - Availability: iOS 17.0+ and macOS 14.0+.
-        /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
+        //TODO: - Add Documentation
     func delete(options: API.Options = []) async throws {
         try await value.delete(options: options)
     }
 }
 
-    // TODO: - (cspell2k5) Extract Binding.default(to:) to a shared SwiftUI utility module
-public extension Binding {
 
-        /// Provides a non-optional Binding by supplying a default value when the original Binding is optional and currently nil.
-        ///
-        /// This helper transforms a `Binding<V?>` into a `Binding<V>` by returning the provided `defaultValue` in the getter
-        /// whenever the wrapped optional is `nil`. Assignments to the returned binding write the new value back into the
-        /// original optional binding, replacing its `nil` with the assigned value.
-        ///
-        /// Use this when your UI requires a non-optional `Binding` (e.g., for SwiftUI controls that don’t accept optionals),
-        /// but your model stores the value as optional.
-        ///
-        /// - Parameter defaultValue: The value to use when the underlying optional binding is `nil`.
-        /// - Returns: A `Binding<V>` that reads as the underlying value or `defaultValue` if `nil`, and writes directly to the underlying optional.
-        /// - Note: The default value is only used for reading. Once a non-nil value is written through the returned binding,
-        ///         that value will be read thereafter.
-        /// - Example:
-        ///   ```swift
-        ///   @State private var nickname: String? = nil
-        ///
-        ///   TextField("Nickname", text: $nickname.default(to: "Guest"))
-        ///   // When nickname is nil, the TextField reads "Guest".
-        ///   // Editing the field writes the new value back into `nickname`.
-        ///   // If Guest were a variable that variable will not be changed.
-        ///   ```
+public extension Binding {
+        //    #warning("This probably shouldn't be in a public extension.")
+        //    static func ??<V>(lhs: Binding<V?>, rhs: V) -> Binding<V> where Value == V? {
+        //        .init(lhs, replacingNilWith: rhs)
+        //    }
+    
+        //TODO: - Add Documentation
     func `default`<V>(to defaultValue: V) -> Binding<V> where Value == V? {
         .init(get: { self.wrappedValue ?? defaultValue },
               set: { self.wrappedValue = $0 })
