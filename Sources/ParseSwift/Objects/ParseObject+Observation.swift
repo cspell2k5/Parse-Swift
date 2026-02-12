@@ -274,7 +274,7 @@ public extension ParseObjectObservable {
 }
 
     // TODO: - (cspell2k5) Extract Binding.default(to:) to a shared SwiftUI utility module
-public extension Binding {
+extension Binding {
         /// Provides a non-optional Binding by supplying a default value when the original Binding is optional and currently nil.
         ///
         /// This helper transforms a `Binding<V?>` into a `Binding<V>` by returning the provided `defaultValue` in the getter
@@ -292,12 +292,13 @@ public extension Binding {
         ///   ```swift
         ///   @State private var nickname: String? = nil
         ///
-        ///   TextField("Nickname", text: $nickname.default(to: "Guest"))
+        ///   TextField("Nickname", text: $nickname.parseDefault(to: "Guest"))
         ///   // When nickname is nil, the TextField reads "Guest".
         ///   // Editing the field writes the new value back into `nickname`.
         ///   // If Guest were a variable that variable will not be changed.
         ///   ```
-    func `default`<V>(to defaultValue: V) -> Binding<V> where Value == V? {
+    @available(macOS 14.0, iOS 17.0, watchOS 10.0, tvOS 17.0, *)
+    public func parseDefault<V>(to defaultValue: V) -> Binding<V> where Value == V? {
         .init(get: { self.wrappedValue ?? defaultValue },
               set: { self.wrappedValue = $0 })
     }
