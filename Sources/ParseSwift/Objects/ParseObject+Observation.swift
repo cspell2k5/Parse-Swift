@@ -1,9 +1,9 @@
-//
-//  ParseObjectObservable.swift
-//  ParseSwift
-//
-//  Created by Craig Spell on 2/10/26.
-//
+    //
+    //  ParseObjectObservable.swift
+    //  ParseSwift
+    //
+    //  Created by Craig Spell on 2/10/26.
+    //
 
 import SwiftUI
 
@@ -26,7 +26,7 @@ import SwiftUI
     ///
     /// Notes:
     /// - Availability: iOS 17.0+ and macOS 14.0+.
-    /// - Threading: Designed to be used from the main actor in UI code; ensure you call async methods appropriately
+    /// - Threading: Isolated to the main actor in UI code; ensure you call async methods appropriately
     ///   within Swift concurrency contexts.
     /// - Identity: This wrapper holds and replaces the underlying value on successful network operations. If your UI
     ///   depends on object identity (e.g., `id`, `objectId`, `hashValue`), be mindful that the wrapped instance may be
@@ -98,10 +98,11 @@ public extension ParseObject {
         /// - Identity: Successful network operations like `save()` or `fetch()` may replace the
         ///   underlying value inside the wrapper. If your UI depends on identity (e.g., `objectId`),
         ///   account for this behavior.
-        /// - Threading: Designed for use from the main actor in UI contexts; call async methods
+        /// - Threading: Isolated to the main actor; call async methods
         ///   within appropriate Swift concurrency contexts.
         ///
         /// - Returns: An observable wrapper around the receiver that integrates with SwiftUI Observation.
+    @MainActor
     var asObservable: ParseObjectObservable<Self> {
         ParseObjectObservable(self)
     }
@@ -109,6 +110,7 @@ public extension ParseObject {
 
 
 @available(macOS 14.0, iOS 17.0, *)
+@MainActor
 public extension ParseObjectObservable {
     
         /// Fetches the latest state of the underlying Parse object from the server and updates this observable wrapper.
