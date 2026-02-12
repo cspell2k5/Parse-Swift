@@ -34,7 +34,7 @@ import SwiftUI
     ///
     /// - Generic Parameter:
     ///   - T: A type conforming to `ParseObject` that represents the underlying Parse model.
-@available(macOS 14.0, iOS 17.0, *)
+@available(macOS 14.0, iOS 17.0, tvOS 17.0, watchOS 10.0, *)
 @MainActor
 @Observable @dynamicMemberLookup
 public class ParseObjectObservable<T: ParseObject> {
@@ -74,7 +74,7 @@ public class ParseObjectObservable<T: ParseObject> {
 }
 
 
-@available(macOS 14.0, iOS 17.0, *)
+@available(macOS 14.0, iOS 17.0, tvOS 17.0, watchOS 10.0, *)
 public extension ParseObject {
         /// A lightweight convenience property that wraps a `ParseObject` in an observable
         /// wrapper compatible with SwiftUI’s Observation framework.
@@ -109,7 +109,7 @@ public extension ParseObject {
 }
 
 
-@available(macOS 14.0, iOS 17.0, *)
+@available(macOS 14.0, iOS 17.0, tvOS 17.0, watchOS 10.0, *)
 @MainActor
 public extension ParseObjectObservable {
     
