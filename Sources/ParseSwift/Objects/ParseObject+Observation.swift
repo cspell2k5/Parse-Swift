@@ -25,7 +25,7 @@ import SwiftUI
     ///   internal value and trigger view updates.
     ///
     /// Notes:
-    /// - Availability: iOS 17.0+ and macOS 14.0+.
+    /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
     /// - Threading: Isolated to the main actor in UI code; ensure you call async methods appropriately
     ///   within Swift concurrency contexts.
     /// - Identity: This wrapper holds and replaces the underlying value on successful network operations. If your UI
@@ -94,7 +94,7 @@ public extension ParseObject {
         ///   - `try await todo.save()`
         ///
         /// Notes:
-        /// - Availability: iOS 17.0+ and macOS 14.0+.
+        /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Identity: Successful network operations like `save()` or `fetch()` may replace the
         ///   underlying value inside the wrapper. If your UI depends on identity (e.g., `objectId`),
         ///   account for this behavior.
@@ -128,7 +128,7 @@ public extension ParseObjectObservable {
         /// - Throws: An error if the network request fails, the object cannot be found, or if the response cannot be decoded.
         /// - Important: This method replaces the wrapped object on success. If your UI or logic depends on identity
         ///              (e.g., `objectId` or hashing), be aware the instance may change after the call completes.
-        /// - Availability: iOS 17.0+, macOS 14.0+.
+        /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Concurrency: Intended for use on the main actor in UI contexts; call from an async context.
     @discardableResult func fetch(includeKeys: [String]? = nil,
                                   options: API.Options = []) async throws -> T {
@@ -155,7 +155,7 @@ public extension ParseObjectObservable {
         /// - Throws: An error if the save operation fails due to networking issues, validation errors, or decoding problems.
         /// - Important: Successful saves replace the wrapped instance. If your UI or logic depends on identity (e.g.,
         ///   `objectId`, equality, or hashing), be aware the instance may change after this call completes.
-        /// - Availability: iOS 17.0+ and macOS 14.0+.
+        /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Concurrency: Intended for use in async contexts on the main actor in UI code.
     @discardableResult func save(ignoringCustomObjectIdConfig: Bool = false,
                                  options: API.Options = []) async throws -> T {
@@ -184,7 +184,7 @@ public extension ParseObjectObservable {
         ///   - Successful creation replaces the wrapped instance. If your UI or logic depends on identity (e.g., `objectId`,
         ///     equality, or hashing), be aware the instance may change after this call completes.
         ///
-        /// - Availability: iOS 17.0+ and macOS 14.0+.
+        /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
     @discardableResult func create(options: API.Options = []) async throws -> T {
         let newValue = try await value.create(options: options)
@@ -211,7 +211,7 @@ public extension ParseObjectObservable {
         ///     If you only need to modify specific fields, consider using `update` instead; to create a new record, use `create`.
         ///   - Successful replacement replaces the wrapped instance. If your UI or logic depends on identity (e.g., `objectId`,
         ///     equality, or hashing), be aware the instance may change after this call completes.
-        /// - Availability: iOS 17.0+ and macOS 14.0+.
+        /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
     @discardableResult func replace(options: API.Options = []) async throws -> T {
         let newValue = try await value.replace(options: options)
@@ -242,7 +242,7 @@ public extension ParseObjectObservable {
         ///   - Successful updates replace the wrapped instance. If your UI or logic depends on identity (e.g., `objectId`,
         ///     equality, or hashing), be aware the instance may change after this call completes.
         ///
-        /// - Availability: iOS 17.0+ and macOS 14.0+.
+        /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
     @discardableResult func update(options: API.Options = []) async throws -> T {
         let newValue = try await value.update(options: options)
@@ -253,23 +253,23 @@ public extension ParseObjectObservable {
         /// Deletes the underlying Parse object from the server.
         ///
         /// This method forwards to `T.delete(options:)` on the wrapped `ParseObject`, issuing a network
-        /// request to remove the object from your Parse backend. On success, the object is deleted on
-        /// the server. Unlike the other mutating operations (`save`, `create`, `replace`, `update`),
-        /// this call does not replace the internal value; however, consumers should consider the object
-        /// invalid for further server-side operations after a successful deletion unless it is recreated.
+        /// request to remove the object from your Parse backend. Unlike other mutating operations in this
+        /// wrapper, a successful delete does not replace the internal `value`; it simply completes if the
+        /// server confirms deletion.
         ///
-        /// - Parameter options: Additional request options that control networking behavior, caching,
-        ///   and other Parse client features. Defaults to an empty set.
-        /// - Throws: An error if the delete operation fails due to networking issues, permissions,
-        ///   or server-side errors.
+        /// - Parameter options: Additional request options that control networking behavior, caching, and
+        ///   other Parse client features. Defaults to an empty set.
+        /// - Throws: An error if the delete operation fails due to networking issues, permissions, or if
+        ///   the object cannot be deleted on the server.
         ///
         /// - Important:
-        ///   - After a successful deletion, subsequent operations that assume the object exists on the
-        ///     server (e.g., `fetch`, `update`) may fail unless the object is recreated.
-        ///   - If your UI or logic depends on the presence of this object, ensure you update state
-        ///     accordingly (e.g., remove it from collections, navigate away from detail views).
+        ///   - After a successful delete, the server no longer has a record for this object. Any subsequent
+        ///     operations that assume server existence (e.g., `fetch`, `update`, `replace`) may fail unless
+        ///     the object is recreated.
+        ///   - If your UI or logic depends on the presence of this object, make sure to update state and
+        ///     navigation accordingly after deletion.
         ///
-        /// - Availability: iOS 17.0+ and macOS 14.0+.
+        /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
     func delete(options: API.Options = []) async throws {
         try await value.delete(options: options)
