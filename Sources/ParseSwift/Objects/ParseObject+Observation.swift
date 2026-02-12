@@ -39,7 +39,7 @@ import SwiftUI
 public class ParseObjectObservable<T: ParseObject> {
     private var value: T
     
-    init(_ value: T) {
+    public init(_ value: T) {
         self.value = value
     }
     
@@ -66,7 +66,7 @@ public class ParseObjectObservable<T: ParseObject> {
         /// - The generic `V` is the property type referenced by the provided key path.
         /// - This is intended for use with properties defined on `T` that are exposed
         ///   via `WritableKeyPath`.
-    subscript<V>(dynamicMember keyPath: WritableKeyPath<T, V>) -> V {
+    public subscript<V>(dynamicMember keyPath: WritableKeyPath<T, V>) -> V {
         get { value[keyPath: keyPath] }
         set { value[keyPath: keyPath] = newValue }
     }
@@ -241,7 +241,7 @@ public extension ParseObjectObservable {
         ///
         /// - Availability: iOS 17.0+ and macOS 14.0+.
         /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
-    @discardableResult internal func update(options: API.Options = []) async throws -> T {
+    @discardableResult func update(options: API.Options = []) async throws -> T {
         let newValue = try await value.update(options: options)
         self.value = newValue
         return newValue
