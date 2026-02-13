@@ -79,27 +79,23 @@ public class ParseObjectObservable<T: ParseObject> {
         /// member lookup. It enables reading properties as if they were defined
         /// on `ParseObjectObservable` itself, without allowing mutation.
         ///
-        /// Use this overload when you only need to read a property (i.e., when
-        /// the property on `T` is exposed via a non-writable `KeyPath`). For
-        /// properties that can be mutated, see the writable
-        /// `subscript(dynamicMember:)` that accepts a `WritableKeyPath`.
-        ///
         /// - Parameter keyPath: A read-only key path referencing a property on the
         ///   underlying `ParseObject` type `T`.
         /// - Returns: The value of the property referenced by `keyPath`.
         ///
         /// Example:
         /// - Read a property:
-        ///   `let title = todo.title`
+        ///   ```
+        ///   let title = todo.title
+        ///   ```
         ///
         /// Notes:
-        /// - This subscript does not permit mutation. To write through to the
-        ///   wrapped object, use the writable dynamic member subscript.
         /// - Accessing properties through this subscript participates in SwiftUI’s
         ///   Observation system because the wrapper is annotated with `@Observable`.
     public subscript<V>(dynamicMember keyPath: KeyPath<T, V>) -> V {
         get { wrappedValue[keyPath: keyPath] }
     }
+
 }
 
 
