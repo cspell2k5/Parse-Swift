@@ -100,6 +100,7 @@ public class ParseObjectObservable<T: ParseObject> {
     public subscript<V>(dynamicMember keyPath: KeyPath<T, V>) -> V {
         get { wrappedValue[keyPath: keyPath] }
     }
+
 }
 
 
