@@ -38,10 +38,10 @@ import SwiftUI
 @MainActor
 @Observable @dynamicMemberLookup
 public class ParseObjectObservable<T: ParseObject> {
-    private var value: T
+    public var wrappedValue: T
     
     public init(_ value: T) {
-        self.value = value
+        self.wrappedValue = value
     }
     
         /// Provides dynamic member lookup into the wrapped ParseObject.
@@ -68,8 +68,37 @@ public class ParseObjectObservable<T: ParseObject> {
         /// - This is intended for use with properties defined on `T` that are exposed
         ///   via `WritableKeyPath`.
     public subscript<V>(dynamicMember keyPath: WritableKeyPath<T, V>) -> V {
-        get { value[keyPath: keyPath] }
-        set { value[keyPath: keyPath] = newValue }
+        get { wrappedValue[keyPath: keyPath] }
+        set { wrappedValue[keyPath: keyPath] = newValue }
+    }
+    
+        /// Provides read-only dynamic member lookup into the wrapped ParseObject.
+        ///
+        /// This subscript forwards property access from the observable wrapper
+        /// directly to the underlying `ParseObject` using key path–based dynamic
+        /// member lookup. It enables reading properties as if they were defined
+        /// on `ParseObjectObservable` itself, without allowing mutation.
+        ///
+        /// Use this overload when you only need to read a property (i.e., when
+        /// the property on `T` is exposed via a non-writable `KeyPath`). For
+        /// properties that can be mutated, see the writable
+        /// `subscript(dynamicMember:)` that accepts a `WritableKeyPath`.
+        ///
+        /// - Parameter keyPath: A read-only key path referencing a property on the
+        ///   underlying `ParseObject` type `T`.
+        /// - Returns: The value of the property referenced by `keyPath`.
+        ///
+        /// Example:
+        /// - Read a property:
+        ///   `let title = todo.title`
+        ///
+        /// Notes:
+        /// - This subscript does not permit mutation. To write through to the
+        ///   wrapped object, use the writable dynamic member subscript.
+        /// - Accessing properties through this subscript participates in SwiftUI’s
+        ///   Observation system because the wrapper is annotated with `@Observable`.
+    public subscript<V>(dynamicMember keyPath: KeyPath<T, V>) -> V {
+        get { wrappedValue[keyPath: keyPath] }
     }
 }
 
@@ -132,8 +161,8 @@ public extension ParseObjectObservable {
         /// - Concurrency: Intended for use on the main actor in UI contexts; call from an async context.
     @discardableResult func fetch(includeKeys: [String]? = nil,
                                   options: API.Options = []) async throws -> T {
-        let newValue = try await value.fetch(includeKeys: includeKeys, options: options)
-        self.value = newValue
+        let newValue = try await wrappedValue.fetch(includeKeys: includeKeys, options: options)
+        self.wrappedValue = newValue
         return newValue
     }
     
@@ -159,8 +188,8 @@ public extension ParseObjectObservable {
         /// - Concurrency: Intended for use in async contexts on the main actor in UI code.
     @discardableResult func save(ignoringCustomObjectIdConfig: Bool = false,
                                  options: API.Options = []) async throws -> T {
-        let newValue = try await value.save(ignoringCustomObjectIdConfig: ignoringCustomObjectIdConfig, options: options)
-        self.value = newValue
+        let newValue = try await wrappedValue.save(ignoringCustomObjectIdConfig: ignoringCustomObjectIdConfig, options: options)
+        self.wrappedValue = newValue
         return newValue
     }
     
@@ -187,8 +216,8 @@ public extension ParseObjectObservable {
         /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
     @discardableResult func create(options: API.Options = []) async throws -> T {
-        let newValue = try await value.create(options: options)
-        self.value = newValue
+        let newValue = try await wrappedValue.create(options: options)
+        self.wrappedValue = newValue
         return newValue
     }
     
@@ -214,8 +243,8 @@ public extension ParseObjectObservable {
         /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
     @discardableResult func replace(options: API.Options = []) async throws -> T {
-        let newValue = try await value.replace(options: options)
-        self.value = newValue
+        let newValue = try await wrappedValue.replace(options: options)
+        self.wrappedValue = newValue
         return newValue
     }
     
@@ -245,8 +274,8 @@ public extension ParseObjectObservable {
         /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
     @discardableResult func update(options: API.Options = []) async throws -> T {
-        let newValue = try await value.update(options: options)
-        self.value = newValue
+        let newValue = try await wrappedValue.update(options: options)
+        self.wrappedValue = newValue
         return newValue
     }
     
@@ -272,7 +301,7 @@ public extension ParseObjectObservable {
         /// - Availability: iOS 17.0+, macOS 14.0+, tvOS 17.0+, watchOS 10.0+.
         /// - Concurrency: Intended for use from async contexts on the main actor in UI code.
     func delete(options: API.Options = []) async throws {
-        try await value.delete(options: options)
+        try await wrappedValue.delete(options: options)
     }
 }
 
