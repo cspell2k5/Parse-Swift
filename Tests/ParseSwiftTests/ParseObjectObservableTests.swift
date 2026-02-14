@@ -20,18 +20,31 @@ final class ParseObjectObservableTests: XCTestCase {
         var originalData: Data?
         
         var title: String?
+        
+        @MainActor
+        static var object: ParseObjectObservable<MockObject> {
+            MockObject(title: "Test").asObservable
+        }
     }
     
     func testAsObservableExtension() {
-        let object = MockObject(title: "Test")
-        let observable = object.asObservable
+        let observable = MockObject.object
         XCTAssertEqual(observable.title, "Test")
+        observable.title = "New Title"
+        XCTAssertEqual(observable.title, "New Title")
+    }
+    
+    func testPointerConversion() throws {
+        let objWithId = MockObject.object
+        objWithId.objectId = "abc123"
+
+        let pointer = try XCTUnwrap(objWithId.toPointer())
+        XCTAssertEqual(pointer.objectId, "abc123")
     }
     
     func testObservationTriggeredOnPropertyChange() {
-        let object = MockObject(title: "Initial")
-        let observable = object.asObservable
-        
+        let observable = MockObject.object
+
         let expectation = self.expectation(description: "Observation should trigger")
         
             // Tracking must access the property to register the dependency
@@ -46,7 +59,7 @@ final class ParseObjectObservableTests: XCTestCase {
         waitForExpectations(timeout: 1.0)
         XCTAssertEqual(observable.title, "Updated")
     }
-    
+        
         /// Tests that the internal value updates correctly (Mocking the concept of a fetch)
     func testInternalValueUpdatesOnManualAssignment() async {
         let object = MockObject(title: "Old")
@@ -68,6 +81,13 @@ final class ParseObjectObservableTests: XCTestCase {
         
         await fulfillment(of: [expectation], timeout: 1.0)
         XCTAssertEqual(observable.title, "New")
+    }
+    
+    func testPointerConversionWithoutObjectIdThrows() {
+        // Given an object without an objectId, pointer conversion should be nil or should fail
+        let objNoId = MockObject(title: "NoId").asObservable
+        XCTAssertThrowsError(try objNoId.toPointer())
+        XCTAssertNil(try? objNoId.toPointer())
     }
 }
 

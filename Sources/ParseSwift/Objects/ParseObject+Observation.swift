@@ -132,6 +132,45 @@ public extension ParseObject {
         ParseObjectObservable(self)
     }
 }
+//MARK: - Utility Functions
+@available(macOS 14.0, iOS 17.0, tvOS 17.0, watchOS 10.0, *)
+public extension ParseObjectObservable {
+    
+        /// Converts the observable Parse object into a Pointer<T>.
+        ///
+        /// This helper produces a lightweight reference (Pointer) to the underlying
+        /// ParseObject wrapped by this observable for easy linking and querying.
+        ///
+        /// Usage:
+        /// - Create a pointer to pass as a relation or a field on another object:
+        /// - Example:
+        ///   ```
+        ///   let authorPointer = try post.asObservable.toPointer()
+        ///   ```
+        /// - Store the pointer on another ParseObject to reference this object
+        ///   without fetching all of its properties.
+        ///
+        /// Requirements:
+        /// - The underlying object must be saved (i.e., have a valid objectId).
+        ///
+        /// - Returns: A `Pointer<T>` referencing the wrapped Parse object.
+        /// - Throws: `ParseError` if the underlying object cannot create a pointer
+        ///  (e.g., Parse Object not saved; missing objectId).
+    func toPointer() throws(ParseError) -> Pointer<T> {
+        do {
+            return try self.wrappedValue.toPointer()
+        } catch let parseError as ParseError {
+                //Currently ParseError is the only possible catch here.
+            throw parseError
+        } catch {
+                // Crashes in Debug/Development, but provides a fallback in Release
+            assertionFailure("Unexpected error type: \(type(of: error)). Expected ParseError.")
+
+            // Safety net for production
+            throw ParseError(code: .unknownError, message: "Unexpected error type")
+        }
+    }
+}
 
 
 @available(macOS 14.0, iOS 17.0, tvOS 17.0, watchOS 10.0, *)
